@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin Rádio Lua</title>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBF3SbUb_-HOObKNmXcpOlVyvtt3Lv7xGY",
+  authDomain: "radiolua-98df1.firebaseapp.com",
+  databaseURL: "https://radiolua-98df1-default-rtdb.firebaseio.com",
+  projectId: "radiolua-98df1",
+  storageBucket: "radiolua-98df1.firebasestorage.app",
+  messagingSenderId: "693418516394",
+  appId: "1:693418516394:web:6653b029b0aa79682cd5d3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.toggleMic = async function(state){
+  await set(ref(db, 'radio/liveMode'), state);
+}
+
+window.setMusicVolume = async function(value){
+  await set(ref(db, 'radio/musicVolume'), Number(value));
+}
+
+window.setBackgroundVolume = async function(value){
+  await set(ref(db, 'radio/backgroundVolume'), Number(value));
+}
+
+window.addSongRequest = async function(){
+  const song = document.getElementById('songRequest').value;
+  if(!song) return;
+  await push(ref(db, 'radio/queue'), {
+    title: song,
+    createdAt: Date.now()
+  });
+  alert('Música adicionada na fila!');
+}
+</script>
+
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+padding:30px;
+}
+.card{
+background:#111827;
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+}
+.vertical{
+writing-mode: bt-lr;
+-webkit-appearance: slider-vertical;
+height:200px;
+}
+button{
+padding:12px 20px;
+border:none;
+border-radius:10px;
+background:#facc15;
+font-weight:bold;
+cursor:pointer;
+}
+input{
+padding:10px;
+width:100%;
+border-radius:10px;
+border:none;
+margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<h1>Painel Admin Rádio Lua</h1>
+
+<div class="card">
+<h2>Microfone ao vivo</h2>
+
+<button onclick="toggleMic(true)">ENTRAR AO VIVO</button>
+<button onclick="toggleMic(false)">SAIR DO AO VIVO</button>
+</div>
+
+<div class="card">
+<h2>Volume da música</h2>
+<input type="range" min="0" max="1" step="0.01" value="0.8" class="vertical"
+oninput="setMusicVolume(this.value)">
+</div>
+
+<div class="card">
+<h2>Volume do fundo</h2>
+<input type="range" min="0" max="1" step="0.01" value="0.4" class="vertical"
+oninput="setBackgroundVolume(this.value)">
+</div>
+
+<div class="card">
+<h2>Fila de músicas</h2>
+<input id="songRequest" placeholder="Nome da música">
+<button onclick="addSongRequest()">Adicionar na fila</button>
+</div>
+
+</body>
+</html>
